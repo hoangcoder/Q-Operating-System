@@ -12,15 +12,15 @@ void systemHelp(string cmd)
 
 void system(string args)
 {
-	if (strEql(args," reboot"))
-	{
+	if (streql(splitArg(args, 1),"reboot"))
+    {
 		reboot();
-	}
-	else if (strEql(args," shutdown"))
-	{
+    }
+	else if (streql(splitArg(args, 1),"shutdown"))
+    {
         shutdown();
     }
-    else if (strEql(args," halt"))
+    else if (streql(splitArg(args, 1),"halt"))
     {
         halt();
     }

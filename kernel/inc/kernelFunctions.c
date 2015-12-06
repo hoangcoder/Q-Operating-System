@@ -22,30 +22,20 @@ void launchShell() {
     int ax = 0;//X location for argumetns
 
     //prepare variable
-    for(int i = 0; i < bufSize; ++i){
-	bufStr[i] = 0;
-    }
-    for(int y = 0; y < bufSize; ++y){
-	for(int x = 0; x < bufSize; ++x){
-		arguments[y][x] = 0;
-    	}
-    }
+    for(int i = 0; i < bufSize; ++i)
+        bufStr[i] = 0;
+    for(int y = 0; y < bufSize; ++y)
+        for(int x = 0; x < bufSize; ++x)
+            arguments[y][x] = 0;
 
     #define TIP print("\nTip: If enter key does not work, it might mean that the input is too long",0x0F);
-    #define HELP print("\nWorking Commands in Q OS: \nwriter\nclear\nexecute\nhi\nskip (the no action)\nfiles\ncat\nreboot\ncalc", 0x0F);
+    #define HELP print("\nWorking Commands in Q OS: \nwriter\nclear\nexecute\nhi\nskip\nfiles\ncat\nsystem\ncalc\nme\ntest", 0x0F);
     #define BIGHELP kbHelp(); TIP; HELP;
-    #define SYSTEMMAN system(arguments);
-    #define SAYHI print("\nHello!", 0x3F);
-    #define CATFILE print("\nFile Name>  ", 0x0F); readStr(bufStr, bufSize); ASSERT(strlength(bufStr) < MAX_FNAME_LEN); cat(finddir_fs(fs_root, bufStr));
     #define SWITCHDIR print("\nThe specified directory was not found ", 0x0F);
-    #define CALCULATE calc(arguments);
     #define BIGCLEAR clearScreen(); printIntro();
     #define MKDIR print("\nThis Command is Reserved for when we have a FAT32 or better FileSystem...", 0x3F);
     #define RMFILE print("\nThis Command is Reserved for when we have a FAT32 or better FileSystem...", 0x3F);
-    #define SKIP skip(rawCommand);
-    #define FILEMAN files(arguments);
-    #define WRITE writer(arguments);
-    #define ME me(rawCommand);
+    #define SEARCHFOR string searchTerm = (string) kmalloc(bufSize * sizeof(char)); print("\nDictionary File Name>  ", 0x0F); readStr(bufStr, bufSize); print("\nSearch Term>  ", 0x0A); readStr(searchTerm, bufSize); if (findInDictionary(bufStr,searchTerm)) { print("\nWe found the word!",0x0F); }
     #define CMDNOTFOUND print("\n", 0x0F); print(bufStr, 0x0F); print(": Command Not Found ", 0x0F);
 
     while (true) {
@@ -55,14 +45,11 @@ void launchShell() {
         readStr(rawCommand, bufSize);
         typingCmd = false;
 
-    	for(int i = 0; i < bufSize; ++i){
+    	for(int i = 0; i < bufSize; ++i)
     	    bufStr[i] = 0;
-    	}
-    	for(int y = 0; y < bufSize; ++y){
-                for(int x = 0; x < bufSize; ++x){
-    		arguments[y][x] = 0;
-    	    }
-    	}
+    	for(int y = 0; y < bufSize; ++y)
+            for(int x = 0; x < bufSize; ++x)
+                arguments[y][x] = 0;
     	fs = 1;
         ay = -1;
         ax = 0;
@@ -100,40 +87,23 @@ void launchShell() {
             }
         }
 
-        if (strEql(strTrim(bufStr), ""))        {   HELP;             }
-        else if(strEql(bufStr, "help"))         {   BIGHELP;          }
-        else if(strEql(bufStr, "system"))       {   SYSTEMMAN;        }
-        else if(strEql(bufStr, "skip"))         {   SKIP;             }
-        else if(strEql(bufStr, "hi"))           {   SAYHI;            }
-        else if(strEql(bufStr, "files"))        {   FILEMAN;          }
-        else if(strEql(bufStr, "cat"))          {   CATFILE;          }
-        else if(strEql(bufStr,"execute"))       {   execute();        }
-        else if(strEql(bufStr,"switch"))        {   SWITCHDIR;        }
-        else if(strEql(bufStr,"writer"))        {   WRITE;            }
-        else if(strEql(bufStr, "calc"))         {   CALCULATE;        }
-        else if(strEql(bufStr, "clear"))        {   clearScreen();    }
-        else if(strEql(bufStr, "clear -i"))     {   BIGCLEAR;         }
-        else if(strEql(bufStr, "newdir"))       {   MKDIR;            }
-        else if(strEql(bufStr, "erase"))        {   RMFILE;           }
-	else if(strEql(bufStr, "me"))           {   ME;               }
-	else if(strEql(bufStr, "search"))
-	{
-string searchTerm;
-
-	    print("\nDictionary File Name>  ", 0x0F);
-	    readStr(bufStr, bufSize);
-	    print("\nSearch Term>  ", 0x0A);
-
-        readStr(searchTerm, bufSize);
-
-	    if (findInDictionary(bufStr,searchTerm))
-        {
-            print("We found the word!",0x0F);
-        }
-
-	}
-        else                                    {   CMDNOTFOUND;      }
-
+        if (streql(strTrim(bufStr), ""))            {   HELP;                   }
+        else if(streql(bufStr, "help"))             {   BIGHELP;                }
+        else if(streql(bufStr, "system"))           {   system(rawCommand);     }
+        else if(streql(bufStr, "skip"))             {   skip(rawCommand);       }
+        else if(streql(bufStr, "files"))            {   files(arguments[0]);    }
+        else if(streql(bufStr, "cat"))              {   cat(rawCommand);        }
+        else if(streql(bufStr,"execute"))           {   execute();              }
+        else if(streql(bufStr,"switch"))            {   SWITCHDIR;              }
+        else if(streql(bufStr,"writer"))            {   writer(arguments[0]);   }
+        else if(streql(bufStr, "calc"))             {   calc(arguments[0]);     }
+        else if(streql(bufStr, "clear"))            {   clearScreen();          }
+        else if(streql(bufStr, "test"))             {   test(arguments[0]);     }
+        else if(streql(bufStr, "newdir"))           {   MKDIR;                  }
+        else if(streql(bufStr, "erase"))            {   RMFILE;                 }
+	    else if(streql(bufStr, "me"))               {   me(rawCommand);         }
+	    else if(streql(bufStr, "search"))           {   SEARCHFOR;              }
+        else                                        {   CMDNOTFOUND;            }
         newline();
     }
 }

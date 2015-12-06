@@ -3,14 +3,27 @@
 #define curWord toUpper(splitArg(args, tmp))
 
 bool hasSetup = false;
+char zip[18];
+
+bool birthYearValid = false;
+bool birthDateValid = false;
+bool birthMonthValid = false;
+
+bool continentValid = false;
+bool countryValid = false;
+bool stateValid = false;
+bool cityValid = false;
+bool zipValid = false;
+
+bool querying = false;
 
 void me(string args) {
-    if (strEql(splitArg(args, 1), "setup") || !hasSetup)
+    if (!hasSetup)
     {
-        if (strEql(splitArg(args, 2), "skip") && !hasSetup)
+        if (streql(splitArg(args, 1), "test") && !hasSetup)
         {
             hasSetup = true;
-            print("\nYou have skipped the Me setup process, some answers may be strange :D",0x06);
+            print("\nYou have skipped the Me setup process.",0x06);
         }
         else if (!hasSetup)
         {
@@ -72,13 +85,10 @@ void me(string args) {
                 readStr(birthMonth,128);
                 birthMonth = toUpper(birthMonth);
 
-                for(uint32 tmp = 0; tmp < arrLength(months); tmp++)
+                if (findInDictionary("me/setup/month.text",birthMonth))
                 {
-                    if (strEql(months[tmp],birthMonth))
-                    {
-                        birthMonthValid = true;
-                        print(" Good",0x02);
-                    }
+                    birthMonthValid = true;
+                    print(" Good",0x02);
                 }
 
                 if (!birthMonthValid)
@@ -95,13 +105,10 @@ void me(string args) {
                 readStr(continent,128);
                 continent = toUpper(continent);
 
-                for(uint32 tmp = 0; tmp < arrLength(continents); tmp++)
+                if (findInDictionary("me/setup/continent.text",continent))
                 {
-                    if (strEql(continents[tmp],continent))
-                    {
-                        continentValid = true;
-                        print(" Good",0x02);
-                    }
+                    continentValid = true;
+                    print(" Good",0x02);
                 }
 
                 if (!continentValid)
@@ -118,13 +125,10 @@ void me(string args) {
                 readStr(country,128);
                 country = toUpper(country);
 
-                for(uint32 tmp = 0; tmp < arrLength(countries); tmp++)
+                if (findInDictionary("me/setup/country.text",country))
                 {
-                    if (strEql(countries[tmp],country))
-                    {
-                        countryValid = true;
-                        print(" Good",0x02);
-                    }
+                    countryValid = true;
+                    print(" Good",0x02);
                 }
 
                 if (!countryValid)
@@ -140,13 +144,10 @@ void me(string args) {
                 readStr(state,128);
                 state = toUpper(state);
 
-                for(uint8 tmp = 0; tmp < arrLength(states); tmp++)
+                if (findInDictionary("me/setup/state.text",state))
                 {
-                    if(strEql(states[tmp],country))
-                    {
-                        stateValid = true;
-                        print(" Good",0x02);
-                    }
+                    stateValid = true;
+                    print(" Good",0x02);
                 }
 
                 if (!stateValid)
@@ -163,26 +164,12 @@ void me(string args) {
             {
                 newline();
                 print("What is the zip/post code in your area: ",0x0B);
-                readStr(zip,17);
-
-                if (strEql(country,"CANADA"))
+                readStr(zip, 17);
+                zipInt = htoi(zip);
+                if (zipInt > 0)
                 {
-                    print(" Good Enough",0x02);
                     zipValid = true;
-                }
-                else
-                {
-                    zipInt = stoi(zip);
-                    if (zipInt < 9999999999999999 && zipInt > 0)
-                    {
-                        zipValid = true;
-                        print(" Good",0x02);
-                    }
-
-                    if (!zipValid)
-                    {
-                        print(" Invalid",0x0C);
-                    }
+                    print(" Good",0x02);
                 }
             }
 
@@ -198,28 +185,25 @@ void me(string args) {
             print("\nYou have already completed the setup process for Me!",0x05);
         }
     }
+    else if (streql(splitArg(args, 1),""))
+    {
+        querying = true;
+        char* meArgs;
+
+        while (querying)
+        {
+            newline();
+
+            meArgs = "";
+
+            print("question>  ",0x0F);
+            readStr(meArgs,128);
+
+            print(answer(meArgs,0),0x04);
+        }
+    }
     else
     {
-        bool over = false;
-        int tmp = 0;
-        while (!over)
-        {
-            tmp++;
-
-            if (strEql(splitArg(args, tmp),""))
-            {
-                over = true;
-            }
-            else
-            {
-                newline();
-                printint(tmp,0x0A);
-                print(" : ",0x0B);
-                print(curWord,0x0A);
-                print(" : ",0x0B);
-                printfloat(sort(splitArg(args, tmp)),0x09);
-
-            }
-        }
+        answer(args,1);
     }
 }

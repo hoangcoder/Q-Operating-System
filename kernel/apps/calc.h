@@ -2,6 +2,7 @@
 #define CALC_H
 
 #include "../inc/math.h"
+#include "../inc/list.h"
 #include "../inc/kbDetect.h"
 #include "../inc/byteUtils.h"
 #include "../inc/charUtils.h"
@@ -17,8 +18,8 @@
 char calcInput[CALCSIZE + 2]; // For `+0`
 int mathOp[CALCSIZE];
 float tempNum;
-float strNum[CALCSIZE];
-int strNumCount;
+float strNum[CALCSIZE];  
+int strNumCount;  
 
 // Initializes the variable map! IMPORTANT!
 void initialize_calc();
